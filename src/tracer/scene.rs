@@ -18,6 +18,14 @@ pub struct Scene {
 }
 
 impl Scene {
+    pub fn new(l: DVec3, amb: DVec3, obj: Vec<Box<dyn Object>>) -> Self {
+        Self {
+            light: l,
+            ambient: amb,
+            objects: obj,
+        }
+    }
+
     pub fn size(&self) -> usize { self.objects.len() }
 
     pub fn hit(&self, r: &Ray) -> Option<Hit> {
@@ -35,7 +43,7 @@ impl Scene {
         let no_block_light = |obj: &&Box<dyn Object>| -> bool {
             obj.hit(r).filter(|hit| {
                 !hit.object.is_translucent()
-                    /* check if object is behind light */
+                /* check if object is behind light */
                     && (hit.p - r.origin).length_squared() <
                     (self.light - r.origin).length_squared()
             }).is_none()
@@ -47,10 +55,10 @@ impl Scene {
 
     pub fn default() -> Self {
         let l = DVec3::new(-0.3, 0.2, -0.1);
-        Self {
-            light: l,
-            ambient: DVec3::splat(0.15),
-            objects: vec![
+        Self::new(
+            l,
+            DVec3::splat(0.15),
+            vec![
                 // floor
                 Plane::new(
                     DVec3::new(0.0, -0.5, 0.0),
@@ -139,6 +147,6 @@ impl Scene {
                     ))),
                 ),
             ]
-        }
+        )
     }
 }
